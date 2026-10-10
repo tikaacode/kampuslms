@@ -5,10 +5,8 @@
 @section('content')
 <h1>Edit Mata Kuliah</h1>
 
-{{-- BUG 6: @csrf DIHILANGKAN dari form ini.
-     Akibatnya: submit form edit akan menghasilkan error 419 (CSRF token mismatch).
-     Seharusnya ada direktif @csrf di dalam form. --}}
 <form method="POST" action="{{ route('courses.update', $course) }}">
+    @csrf
     @method('PUT')
 
     <div>

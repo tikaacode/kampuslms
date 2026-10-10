@@ -18,8 +18,8 @@ class StoreCourseRequest extends FormRequest
             'name'        => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string'],
             'sks'         => ['required', 'integer', 'between:1,6'],
-            'lecturer_id' => ['required'],
-            'status'      => ['required', 'string'],
+            'lecturer_id' => ['required', 'exists:users,id'],
+            'status'      => ['required', 'in:draft,active,archived'],
         ];
     }
 

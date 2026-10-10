@@ -5,7 +5,7 @@
 @section('content')
 <h1>Daftar Mata Kuliah</h1>
 
-{{-- Form pencarian — nilai dari session, bukan query string --}}
+{{-- Form pencarian (query string) --}}
 <form method="GET" action="{{ route('courses.index') }}">
     <input type="text" name="q" value="{{ $q }}" placeholder="Cari kode atau nama...">
     <select name="status">

@@ -12,18 +12,8 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
-        // BUG 3: filter disimpan ke session, bukan diambil dari query string.
-        // Akibatnya: dua tab browser saling mengganggu, URL tidak bisa dibagikan,
-        // dan tombol Back tidak bekerja sesuai harapan.
-        if ($request->filled('q')) {
-            session(['course_search' => $request->q]);
-        }
-        if ($request->filled('status')) {
-            session(['course_status' => $request->status]);
-        }
-
-        $q      = session('course_search');
-        $status = session('course_status');
+        $q      = $request->query('q');
+        $status = $request->query('status');
 
         $courses = Course::query()
             ->with('lecturer')
@@ -31,9 +21,8 @@ class CourseController extends Controller
                                                   ->orWhere('code', 'like', "%$q%"))
             ->when($status, fn ($query) => $query->where('status', $status))
             ->latest()
-            // BUG 4: ->withQueryString() dihilangkan.
-            // Akibatnya: klik halaman 2 → filter hilang → pengguna bingung.
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('courses.index', compact('courses', 'q', 'status'));
     }
@@ -48,13 +37,8 @@ class CourseController extends Controller
     {
         Course::create($request->validated());
 
-        // BUG 5: tidak redirect setelah store — langsung return view.
-        // Akibatnya: tekan F5 setelah simpan → browser kirim ulang POST → data duplikat.
-        return view('courses.index', [
-            'courses' => Course::with('lecturer')->latest()->paginate(15),
-            'q'       => null,
-            'status'  => null,
-        ]);
+        return redirect()->route('courses.index')
+                         ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
     public function show(Course $course)
