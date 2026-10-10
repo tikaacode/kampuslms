@@ -26,27 +26,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        // BUG 6: User enumeration — dua pesan berbeda memberi tahu penyerang
-        // apakah email itu terdaftar atau tidak.
-        if (! $user) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Akun dengan email ini tidak ditemukan.'],
-            ]);
-        }
-
-        if (! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Kata sandi yang Anda masukkan tidak tepat.'],
+                'email' => ['Kredensial yang diberikan tidak cocok dengan data kami.'],
             ]);
         }
 
         Auth::login($user);
 
-        // BUG 5: session()->regenerate() DIHILANGKAN.
-        // Tanpanya, ID session tidak berubah setelah login.
-        // Penyerang yang berhasil menanamkan ID session tertentu pada korban
-        // akan ikut "login" saat korban berhasil autentikasi.
-        // Seharusnya: $request->session()->regenerate();
+        $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard'));
     }

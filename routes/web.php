@@ -21,6 +21,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile',   [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile',   [ProfileController::class, 'update'])->name('profile.update');
 
+    Route::get('/courses',          [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
+
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('courses', CourseController::class);
     });
@@ -30,10 +33,7 @@ Route::middleware('auth')->group(function () {
              ->only(['index', 'show', 'create', 'store']);
     });
 
-    // BUG 7: Route mata kuliah untuk dosen berada DI LUAR grup middleware role:dosen.
-    // Semua pengguna yang sudah login (termasuk mahasiswa) bisa mengakses
-    // /dosen/courses, /dosen/courses/create, dst — tanpa pengecekan peran.
-    Route::prefix('dosen')->name('dosen.')->group(function () {
+    Route::middleware('role:dosen')->prefix('dosen')->name('dosen.')->group(function () {
         Route::resource('courses', CourseController::class)->except(['index', 'show']);
         Route::resource('courses.materials', MaterialController::class)->shallow();
     });

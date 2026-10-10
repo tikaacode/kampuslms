@@ -4,21 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Submission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SubmissionController extends Controller
 {
     public function index()
     {
-        $submissions = auth()->user()->submissions()->with('assignment')->latest()->get();
+        $submissions = auth()->user()->submissions()->with('assignment.course')->latest()->get();
         return view('submissions.index', compact('submissions'));
     }
 
-    // BUG 1b: Tidak ada Gate::authorize() — hanya @can di Blade yang menyembunyikan tombol.
-    // Mahasiswa A bisa mengakses /submissions/{id} milik mahasiswa B
-    // cukup dengan mengetik URL-nya langsung di browser.
-    // Ini adalah IDOR dari minggu 5 yang belum ditutup oleh Policy.
     public function show(Submission $submission)
     {
+        Gate::authorize('view', $submission);
+
         return view('submissions.show', compact('submission'));
     }
 

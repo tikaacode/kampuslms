@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class MaterialController extends Controller
 {
@@ -21,6 +22,8 @@ class MaterialController extends Controller
 
     public function create(Course $course)
     {
+        Gate::authorize('update', $course);
+
         return view('materials.create', compact('course'));
     }
 
@@ -32,12 +35,7 @@ class MaterialController extends Controller
             'order'   => ['nullable', 'integer'],
         ]);
 
-        // BUG 9: $this->authorize() dipakai bukan Gate::authorize().
-        // Di Laravel 11+, kelas dasar Controller sudah TIDAK menyertakan
-        // trait AuthorizesRequests lagi, sehingga $this->authorize() akan
-        // melempar: "Call to undefined method authorize()".
-        // Seharusnya: Gate::authorize('create', $course);
-        $this->authorize('create', $course);
+        Gate::authorize('update', $course);
 
         $material = $course->materials()->create($request->only(['title', 'content', 'order']));
 
@@ -47,6 +45,8 @@ class MaterialController extends Controller
 
     public function edit(Course $course, Material $material)
     {
+        Gate::authorize('update', $course);
+
         return view('materials.edit', compact('course', 'material'));
     }
 
@@ -58,8 +58,7 @@ class MaterialController extends Controller
             'order'   => ['nullable', 'integer'],
         ]);
 
-        // BUG 9 (lanjutan): $this->authorize() juga di sini.
-        $this->authorize('update', $course);
+        Gate::authorize('update', $course);
 
         $material->update($request->only(['title', 'content', 'order']));
 
@@ -69,6 +68,8 @@ class MaterialController extends Controller
 
     public function destroy(Course $course, Material $material)
     {
+        Gate::authorize('update', $course);
+
         $material->delete();
         return redirect()->route('materials.index', $course)
                          ->with('success', 'Materi berhasil dihapus.');
