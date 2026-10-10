@@ -26,11 +26,8 @@
     <nav>
         <a href="{{ url('/') }}">🏠 Home</a>
 
-        {{-- BUG 4: URL hardcode, bukan route('courses.index').
-                     Jika nama route atau prefix berubah, link navbar ini
-                     tidak ikut berubah dan akan menjadi broken link. --}}
-        <a href="/courses">📚 Mata Kuliah</a>
-        <a href="/courses/create">➕ Tambah MK</a>
+        <a href="{{ route('courses.index') }}">📚 Mata Kuliah</a>
+        <a href="{{ route('courses.create') }}">➕ Tambah MK</a>
     </nav>
     <main>
         @yield('content')
