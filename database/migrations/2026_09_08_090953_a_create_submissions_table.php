@@ -4,8 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// Tabel ini seharusnya dibuat SEBELUM grades (karena grades.submission_id → submissions.id).
-// Tapi karena nama file _b_ datang setelah _a_ (grades), urutan eksekusi salah.
 return new class extends Migration
 {
     public function up(): void
@@ -19,7 +17,7 @@ return new class extends Migration
             $table->timestamp('submitted_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['assignment_id', 'user_id']); // unique composite ini BENAR (bukan bug)
+            $table->unique(['assignment_id', 'user_id']);
         });
     }
 

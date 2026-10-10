@@ -20,7 +20,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        User::create($request->all());
+        User::create($request->only(['name', 'email', 'password']));
 
         return redirect()->route('users.index')
                          ->with('success', 'Pengguna berhasil dibuat.');
@@ -38,7 +38,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $user->update($request->all());
+        $user->update($request->only(['name', 'email']));
 
         return redirect()->route('users.show', $user)
                          ->with('success', 'Pengguna berhasil diperbarui.');

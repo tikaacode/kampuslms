@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedTinyInteger('score');
             $table->text('feedback')->nullable();
             $table->timestamps();
+
+            $table->unique('submission_id');
         });
     }
 
