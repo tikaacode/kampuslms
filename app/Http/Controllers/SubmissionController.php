@@ -14,12 +14,11 @@ class SubmissionController extends Controller
         return view('submissions.index', compact('submissions'));
     }
 
-    // BUG 2a: IDOR — tidak ada pengecekan kepemilikan.
-    // Siapa pun yang login bisa mengakses /submissions/{id} milik orang lain
-    // hanya dengan mengganti angka di URL.
-    // Route model binding hanya menjamin data ADA, bukan bahwa pengguna BERHAK melihatnya.
     public function show(Submission $submission)
     {
+        // Cegah IDOR: hanya pemilik submission yang boleh mengakses
+        abort_if($submission->user_id !== auth()->id() && auth()->user()->role !== 'admin', 403, 'Anda tidak berhak melihat submission ini.');
+
         return view('submissions.show', compact('submission'));
     }
 
@@ -42,7 +41,7 @@ class SubmissionController extends Controller
             'submitted_at'  => now(),
         ]);
 
-        return redirect()->route('submissions.show', $submission)
+        return redirect()->route('mahasiswa.submissions.show', $submission)
                          ->with('success', 'Tugas berhasil dikumpulkan.');
     }
 }
